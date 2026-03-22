@@ -96,6 +96,7 @@ _sylius-install:
 	@echo ">>> Installing Sylius via Composer (this takes several minutes)..."
 	$(PHP) composer create-project sylius/sylius-standard /tmp/sylius-install --no-interaction --prefer-dist
 	$(PHP) bash -c 'cp -rn /tmp/sylius-install/. /var/www/html/ && rm -rf /tmp/sylius-install'
+	$(PHP) bash -c 'rm -f /var/www/html/compose.yml /var/www/html/compose.override.dist.yml /var/www/html/docker-compose.yml /var/www/html/docker-compose.yaml'
 	@echo ">>> Running Sylius install (migrations + fixtures + assets)..."
 	$(PHP) php bin/console sylius:install --no-interaction
 	$(PHP) php bin/console cache:warmup
