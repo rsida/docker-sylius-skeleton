@@ -1,102 +1,102 @@
 # docker-sylius-skeleton
 
-Squelette Docker pour bootstrapper un nouveau projet Sylius. Repose sur [docker-base](../docker-base) pour la gestion du reverse proxy Traefik et des certificats TLS locaux.
+Docker skeleton for bootstrapping a new Sylius project. Relies on [docker-base](../docker-base) for Traefik reverse proxy and local TLS certificate management.
 
 ---
 
-## Prérequis
+## Prerequisites
 
-| Outil | Version minimale |
-|-------|-----------------|
+| Tool | Minimum version |
+|------|----------------|
 | Docker + Docker Compose v2 | Docker 24+ |
 | GNU Make | 4+ |
-| docker-base | en cours d'exécution |
+| docker-base | running |
 
 ### docker-base
 
-Ce projet **ne gère pas Traefik ni les certificats TLS**. Ces responsabilités appartiennent à `docker-base`, qui doit être démarré avant tout.
+This project **does not manage Traefik or TLS certificates**. Those are handled by `docker-base`, which must be running before starting this project.
 
 ```bash
-# Dans le répertoire docker-base
+# In the docker-base directory
 make up
 ```
 
-`docker-base` crée le réseau externe `traefik-net`. Si ce réseau est absent, les conteneurs refuseront de démarrer avec l'erreur :
+`docker-base` creates the external network `traefik-net`. If that network is missing, containers will fail to start with:
 ```
 network traefik-net declared as external, but could not be found
 ```
 
 ---
 
-## Scénario 1 — Créer un nouveau projet Sylius
+## Scenario 1 — Create a new Sylius project
 
-À utiliser **une seule fois**, sur un skeleton vierge, pour bootstrapper un nouveau projet.
+Use this **once**, on a fresh skeleton, to bootstrap a new project.
 
-### 1. Cloner le skeleton
+### 1. Clone the skeleton
 
 ```bash
-git clone <url-de-ce-repo> mon-projet
-cd mon-projet
+git clone <this-repo-url> my-project
+cd my-project
 ```
 
-### 2. Configurer l'environnement
+### 2. Configure the environment
 
 ```bash
 cp .env.example .env
 ```
 
-Éditer `.env` et ajuster au minimum :
+Edit `.env` and adjust at minimum:
 
-| Variable | Description | Exemple |
+| Variable | Description | Example |
 |----------|-------------|---------|
-| `APP_NAME` | Nom unique du projet (containers, réseau, routeur Traefik) | `mon-boutique` |
-| `APP_DOMAIN` | Domaine local | `mon-boutique.local` |
-| `DB_ROOT_PASSWORD` | Mot de passe root MariaDB | `secret-root` |
-| `DB_PASSWORD` | Mot de passe utilisateur MariaDB | `secret-user` |
-| `APP_SECRET` | Clé secrète Symfony (chaîne aléatoire 32 car.) | `a1b2c3...` |
+| `APP_NAME` | Unique project name (containers, network, Traefik router) | `my-shop` |
+| `APP_DOMAIN` | Local domain | `my-shop.local` |
+| `DB_ROOT_PASSWORD` | MariaDB root password | `secret-root` |
+| `DB_PASSWORD` | MariaDB user password | `secret-user` |
+| `APP_SECRET` | Symfony secret key (random 32-char string) | `a1b2c3...` |
 
-> **Important** : `APP_NAME` doit être **unique** sur votre machine parmi tous les projets utilisant docker-base. Il est utilisé comme préfixe pour les noms de containers et les routeurs Traefik.
+> **Important**: `APP_NAME` must be **unique** across all docker-base projects on your machine. It is used as a prefix for container names and Traefik routers.
 
-### 3. Ajouter le domaine dans /etc/hosts
+### 3. Add the domain to /etc/hosts
 
 ```bash
-echo "127.0.0.1 mon-boutique.local mail.mon-boutique.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1 my-shop.local mail.my-shop.local" | sudo tee -a /etc/hosts
 ```
 
-Remplacer `mon-boutique.local` par la valeur de `APP_DOMAIN` dans votre `.env`.
+Replace `my-shop.local` with the value of `APP_DOMAIN` from your `.env`.
 
-### 4. Lancer l'installation
+### 4. Run the installation
 
 ```bash
 make install
 ```
 
-Cette commande effectue dans l'ordre :
-1. Crée `.env` depuis `.env.example` si absent
-2. Construit les images Docker
-3. Démarre les containers
-4. Attend que MariaDB soit prêt
-5. Installe Sylius via `composer create-project` dans un répertoire temporaire, puis copie les fichiers
-6. Exécute `sylius:install` (migrations, fixtures, compilation des assets)
-7. Réchauffe le cache
+This command runs in order:
+1. Creates `.env` from `.env.example` if missing
+2. Builds Docker images
+3. Starts containers
+4. Waits for MariaDB to be ready
+5. Installs Sylius via `composer create-project` in a temp directory, then copies the files
+6. Runs `sylius:install` (migrations, fixtures, asset compilation)
+7. Warms up the cache
 
-L'installation prend **5 à 15 minutes** lors du premier lancement (téléchargement des dépendances Composer et Node).
+Installation takes **5 to 15 minutes** on first run (Composer and Node dependency downloads).
 
-Une fois terminé :
+When complete:
 ```
 Sylius is ready!
-  App:    https://mon-boutique.local
-  Admin:  https://mon-boutique.local/admin
-  Mail:   https://mail.mon-boutique.local
+  App:    https://my-shop.local
+  Admin:  https://my-shop.local/admin
+  Mail:   https://mail.my-shop.local
 ```
 
-Identifiants admin par défaut générés par les fixtures Sylius :
-- Login : `sylius@example.com`
-- Mot de passe : `sylius`
+Default admin credentials generated by Sylius fixtures:
+- Login: `sylius@example.com`
+- Password: `sylius`
 
-### 5. Versionner l'application Sylius
+### 5. Commit the Sylius application
 
-Après `make install`, les fichiers Sylius sont présents dans le répertoire. Commitez-les pour que les autres développeurs puissent travailler sur le projet sans refaire `create-project` :
+After `make install`, the Sylius files are present in the directory. Commit them so other developers can work on the project without re-running `create-project`:
 
 ```bash
 git add composer.json composer.lock config/ src/ templates/ translations/ migrations/ public/ assets/
@@ -106,70 +106,70 @@ git push
 
 ---
 
-## Scénario 2 — Rejoindre un projet existant
+## Scenario 2 — Join an existing project
 
-À utiliser quand `make install` a déjà été exécuté et que `composer.json` est présent dans le dépôt.
+Use this when `make install` has already been run and `composer.json` is present in the repository.
 
-### 1. Cloner le projet
+### 1. Clone the project
 
 ```bash
-git clone <url-du-projet> mon-projet
-cd mon-projet
+git clone <project-repo-url> my-project
+cd my-project
 ```
 
-### 2. Configurer l'environnement
+### 2. Configure the environment
 
 ```bash
 cp .env.example .env
-# Renseigner les credentials fournis par l'équipe (DB_PASSWORD, APP_SECRET, etc.)
+# Fill in the credentials provided by your team (DB_PASSWORD, APP_SECRET, etc.)
 ```
 
-### 3. Ajouter le domaine dans /etc/hosts
+### 3. Add the domain to /etc/hosts
 
 ```bash
-echo "127.0.0.1 mon-boutique.local mail.mon-boutique.local" | sudo tee -a /etc/hosts
+echo "127.0.0.1 my-shop.local mail.my-shop.local" | sudo tee -a /etc/hosts
 ```
 
-### 4. Lancer le setup
+### 4. Run setup
 
 ```bash
 make setup
 ```
 
-`make setup` installe les dépendances Composer, exécute les migrations et installe les assets **sans** refaire `composer create-project`.
+`make setup` installs Composer dependencies, runs migrations, and installs assets **without** re-running `composer create-project`.
 
 ---
 
-## Usage quotidien
+## Daily usage
 
 ```bash
-make up                          # Démarrer les containers
-make down                        # Arrêter les containers
-make shell                       # Shell bash dans le container PHP
-make console CMD="cache:clear"   # Commande Symfony
-make cc                          # Vider le cache
-make logs                        # Logs de tous les services
-make logs SERVICES="php nginx"   # Logs d'un service spécifique
-make ps                          # État des containers
-make help                        # Liste complète des commandes
+make up                          # Start containers
+make down                        # Stop containers
+make shell                       # Bash shell in the PHP container
+make console CMD="cache:clear"   # Run a Symfony console command
+make cc                          # Clear Symfony cache
+make logs                        # Follow logs for all services
+make logs SERVICES="php nginx"   # Follow logs for specific services
+make ps                          # Show container status
+make help                        # List all available commands
 ```
 
 ---
 
 ## Xdebug
 
-Xdebug est installé et configuré pour PHPStorm. Il fonctionne en **trigger mode** : il ne s'active qu'à la demande et n'impacte pas les performances lors d'une navigation normale.
+Xdebug is installed and configured for PHPStorm. It runs in **trigger mode**: it only activates on demand and has no performance impact during normal browsing.
 
-**Pour activer le débogage :**
+**To enable debugging:**
 
-1. Installez l'extension navigateur [Xdebug Helper](https://chromewebstore.google.com/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc)
-2. Activez le mode "Debug" dans l'extension (icône verte)
-3. Dans PHPStorm, démarrez "Listen for PHP Debug Connections" (icône téléphone)
-4. Posez un point d'arrêt et rechargez la page
+1. Install the [Xdebug Helper](https://chromewebstore.google.com/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc) browser extension
+2. Enable "Debug" mode in the extension (green icon)
+3. In PHPStorm, start "Listen for PHP Debug Connections" (phone icon)
+4. Set a breakpoint and reload the page
 
-Paramètres Xdebug :
-- Port : `9003`
-- IDE Key : `PHPSTORM`
+Xdebug settings:
+- Port: `9003`
+- IDE Key: `PHPSTORM`
 
 ---
 
@@ -178,46 +178,46 @@ Paramètres Xdebug :
 | Service | URL | Description |
 |---------|-----|-------------|
 | Application | `https://<APP_DOMAIN>` | Sylius frontend |
-| Admin | `https://<APP_DOMAIN>/admin` | Back-office Sylius |
-| Mailpit | `https://mail.<APP_DOMAIN>` | Capture des emails (dev) |
-| MariaDB | `mariadb:3306` (interne uniquement) | Base de données |
+| Admin | `https://<APP_DOMAIN>/admin` | Sylius back-office |
+| Mailpit | `https://mail.<APP_DOMAIN>` | Email catcher (dev) |
+| MariaDB | `mariadb:3306` (internal only) | Database |
 
-Les ports ne sont **pas** exposés sur l'hôte — tout le trafic passe par Traefik (géré par docker-base).
-
----
-
-## Variables d'environnement
-
-Toutes les variables sont définies dans `.env` (copié depuis `.env.example`).
-
-| Variable | Défaut | Description |
-|----------|--------|-------------|
-| `APP_NAME` | `sylius` | Préfixe unique pour containers et routeurs Traefik |
-| `APP_DOMAIN` | `sylius.local` | Domaine local de l'application |
-| `APP_ENV` | `dev` | Environnement Symfony |
-| `APP_SECRET` | `change-me-in-production` | Clé secrète Symfony |
-| `TRAEFIK_NETWORK` | `traefik-net` | Réseau externe Traefik (doit correspondre à docker-base) |
-| `DB_ROOT_PASSWORD` | `root` | Mot de passe root MariaDB |
-| `DB_NAME` | `sylius` | Nom de la base de données |
-| `DB_USER` | `sylius` | Utilisateur MariaDB |
-| `DB_PASSWORD` | `sylius` | Mot de passe utilisateur MariaDB |
+Ports are **not** exposed on the host — all traffic goes through Traefik (managed by docker-base).
 
 ---
 
-## Structure du projet
+## Environment variables
+
+All variables are defined in `.env` (copied from `.env.example`).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `APP_NAME` | `sylius` | Unique prefix for containers and Traefik routers |
+| `APP_DOMAIN` | `sylius.local` | Local application domain |
+| `APP_ENV` | `dev` | Symfony environment |
+| `APP_SECRET` | `change-me-in-production` | Symfony secret key |
+| `TRAEFIK_NETWORK` | `traefik-net` | External Traefik network (must match docker-base) |
+| `DB_ROOT_PASSWORD` | `root` | MariaDB root password |
+| `DB_NAME` | `sylius` | Database name |
+| `DB_USER` | `sylius` | MariaDB user |
+| `DB_PASSWORD` | `sylius` | MariaDB user password |
+
+---
+
+## Project structure
 
 ```
 docker-sylius-skeleton/
 ├── docker/
 │   ├── nginx/
-│   │   └── default.conf     # Configuration Nginx (PHP-FPM + propagation HTTPS Traefik)
+│   │   └── default.conf     # Nginx config (PHP-FPM + Traefik HTTPS forwarding)
 │   └── php/
-│       ├── Dockerfile        # PHP 8.3-FPM + extensions Sylius + Composer 2 + Node.js 20
-│       ├── php.ini           # Paramètres PHP (mémoire 512M, upload 64M)
-│       └── xdebug.ini        # Configuration Xdebug 3 (trigger mode, port 9003)
-├── .env.example              # Template de configuration — copier en .env
+│       ├── Dockerfile        # PHP 8.3-FPM + Sylius extensions + Composer 2 + Node.js 20
+│       ├── php.ini           # PHP settings (memory 512M, upload 64M)
+│       └── xdebug.ini        # Xdebug 3 config (trigger mode, port 9003)
+├── .env.example              # Configuration template — copy to .env
 ├── .gitignore
-├── compose.yaml              # Services : nginx, php, mariadb, mailpit
-├── Makefile                  # Commandes de développement
+├── compose.yaml              # Services: nginx, php, mariadb, mailpit
+├── Makefile                  # Development commands
 └── README.md
 ```
