@@ -1,0 +1,24 @@
+# Environment
+.env
+
+# Sylius / Symfony application files (created by make install)
+/vendor/
+/node_modules/
+/var/
+/public/build/
+/public/bundles/
+/.env.local
+/.env.*.local
+
+# Composer
+composer.phar
+
+# IDE
+/.idea/
+/.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
