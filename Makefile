@@ -89,7 +89,7 @@ _env:
 _wait-db:
 	@echo ">>> Waiting for MariaDB to be ready..."
 	@$(COMPOSE) exec mariadb bash -c \
-		'until mysqladmin ping -u root -p"$$MYSQL_ROOT_PASSWORD" --silent 2>/dev/null; do sleep 1; done'
+		'until mariadb-admin ping -u root -p"$$MYSQL_ROOT_PASSWORD" --silent 2>/dev/null; do sleep 1; done'
 	@echo ">>> MariaDB is ready."
 
 _sylius-install:
