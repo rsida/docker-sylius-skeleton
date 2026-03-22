@@ -100,6 +100,7 @@ _sylius-install:
 	@echo ">>> Running Sylius install (migrations + fixtures + assets)..."
 	$(PHP) php bin/console sylius:install --no-interaction
 	$(PHP) php bin/console cache:warmup
+	$(COMPOSE) exec -u root php chown -R www-data:www-data /var/www/html/var
 
 _sylius-setup:
 	@echo ">>> Installing Composer dependencies..."
@@ -109,3 +110,4 @@ _sylius-setup:
 	@echo ">>> Installing assets..."
 	$(PHP) php bin/console assets:install
 	$(PHP) php bin/console cache:warmup
+	$(COMPOSE) exec -u root php chown -R www-data:www-data /var/www/html/var
