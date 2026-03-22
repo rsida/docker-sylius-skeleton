@@ -99,6 +99,9 @@ _sylius-install:
 	$(PHP) bash -c 'rm -f /var/www/html/compose.yml /var/www/html/compose.override.dist.yml /var/www/html/docker-compose.yml /var/www/html/docker-compose.yaml'
 	@echo ">>> Running Sylius install (migrations + fixtures + assets)..."
 	$(PHP) php bin/console sylius:install --no-interaction
+	@echo ">>> Building frontend assets..."
+	$(PHP) npm install
+	$(PHP) npm run build
 	$(PHP) php bin/console cache:warmup
 	$(COMPOSE) exec -u root php chown -R www-data:www-data /var/www/html/var
 
@@ -109,5 +112,8 @@ _sylius-setup:
 	$(PHP) php bin/console doctrine:migrations:migrate --no-interaction
 	@echo ">>> Installing assets..."
 	$(PHP) php bin/console assets:install
+	@echo ">>> Building frontend assets..."
+	$(PHP) npm install
+	$(PHP) npm run build
 	$(PHP) php bin/console cache:warmup
 	$(COMPOSE) exec -u root php chown -R www-data:www-data /var/www/html/var
