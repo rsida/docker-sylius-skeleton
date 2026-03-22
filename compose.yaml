@@ -1,7 +1,7 @@
 ---
 # docker-sylius-skeleton
 #
-# Requires docker-base (Traefik) to be running.
+# Requires local-network-multisite (Traefik) to be running.
 # Services do NOT expose host ports — Traefik handles routing and TLS.
 #
 # Usage:

@@ -1,6 +1,6 @@
 # docker-sylius-skeleton
 
-Docker skeleton for bootstrapping a new Sylius project. Relies on [docker-base](../docker-base) for Traefik reverse proxy and local TLS certificate management.
+Docker skeleton for bootstrapping a new Sylius project. Relies on [local-network-multisite](https://github.com/rsida/local-network-multisite) for Traefik reverse proxy and local TLS certificate management.
 
 ---
 
@@ -10,18 +10,18 @@ Docker skeleton for bootstrapping a new Sylius project. Relies on [docker-base](
 |------|----------------|
 | Docker + Docker Compose v2 | Docker 24+ |
 | GNU Make | 4+ |
-| docker-base | running |
+| local-network-multisite | running |
 
-### docker-base
+### local-network-multisite
 
-This project **does not manage Traefik or TLS certificates**. Those are handled by `docker-base`, which must be running before starting this project.
+This project **does not manage Traefik or TLS certificates**. Those are handled by `local-network-multisite`, which must be running before starting this project.
 
 ```bash
-# In the docker-base directory
+# In the local-network-multisite directory
 make up
 ```
 
-`docker-base` creates the external network `traefik-net`. If that network is missing, containers will fail to start with:
+`local-network-multisite` creates the external network `traefik-net`. If that network is missing, containers will fail to start with:
 ```
 network traefik-net declared as external, but could not be found
 ```
@@ -55,7 +55,7 @@ Edit `.env` and adjust at minimum:
 | `DB_PASSWORD` | MariaDB user password | `secret-user` |
 | `APP_SECRET` | Symfony secret key (random 32-char string) | `a1b2c3...` |
 
-> **Important**: `APP_NAME` must be **unique** across all docker-base projects on your machine. It is used as a prefix for container names and Traefik routers.
+> **Important**: `APP_NAME` must be **unique** across all local-network-multisite projects on your machine. It is used as a prefix for container names and Traefik routers.
 
 ### 3. Add the domain to /etc/hosts
 
@@ -182,7 +182,7 @@ Xdebug settings:
 | Mailpit | `https://mail.<APP_DOMAIN>` | Email catcher (dev) |
 | MariaDB | `mariadb:3306` (internal only) | Database |
 
-Ports are **not** exposed on the host — all traffic goes through Traefik (managed by docker-base).
+Ports are **not** exposed on the host — all traffic goes through Traefik (managed by local-network-multisite).
 
 ---
 
@@ -196,7 +196,7 @@ All variables are defined in `.env` (copied from `.env.example`).
 | `APP_DOMAIN` | `sylius.local` | Local application domain |
 | `APP_ENV` | `dev` | Symfony environment |
 | `APP_SECRET` | `change-me-in-production` | Symfony secret key |
-| `TRAEFIK_NETWORK` | `traefik-net` | External Traefik network (must match docker-base) |
+| `TRAEFIK_NETWORK` | `traefik-net` | External Traefik network (must match local-network-multisite) |
 | `DB_ROOT_PASSWORD` | `root` | MariaDB root password |
 | `DB_NAME` | `sylius` | Database name |
 | `DB_USER` | `sylius` | MariaDB user |
