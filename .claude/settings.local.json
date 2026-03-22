@@ -5,7 +5,18 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(''''name:'''', d.get\\(''''name''''\\)\\); print\\(''''require keys:'''', list\\(d.get\\(''''require'''',{}\\).keys\\(\\)\\)[:10]\\)\")",
       "Bash(git remote:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Read(//home/romain/project/test_sylius/**)",
+      "Bash(docker compose:*)",
+      "Bash(ls ~/project/test_sylius/compose*)",
+      "Bash(ls ~/project/test_sylius/docker-compose*)",
+      "Bash(sudo rm:*)",
+      "Bash(docker run:*)",
+      "Bash(cp ~/project/test_sylius2/.env.example ~/project/test_sylius2/.env)",
+      "Read(//home/romain/project/test_sylius2/**)",
+      "Bash(make install:*)",
+      "Bash(curl -sk -o /dev/null -w \"%{http_code}\" https://sylius.local/)",
+      "Bash(curl -sk -o /dev/null -w \"%{http_code}\" https://sylius.local/admin)"
     ]
   }
 }
